@@ -1,2 +1,0 @@
-# fightpass-backend
-Backend Repository
