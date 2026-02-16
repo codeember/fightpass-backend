@@ -597,7 +597,7 @@ app.post('/api/v1/purchases/events', authenticateToken, async (req, res) => {
         <li><strong>Tokens Used:</strong> ${event.price}</li>
       </ul>
       <p style="margin-top: 15px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107;">
-        <strong>⚠️ Keep this receipt safe!</strong> Your access token is required to watch this event.
+        <strong>Keep this receipt safe!</strong> Your access token is required to watch this event.
       </p>
     `;
 
@@ -818,7 +818,7 @@ app.post('/api/v1/tokens/purchase', authenticateToken, async (req, res) => {
         <p><strong>${pkg.name}</strong></p>
         <ul>
           <li>${pkg.tokens} Base Tokens</li>
-          ${pkg.bonus > 0 ? `<li>+ ${pkg.bonus} Bonus Tokens 🎁</li>` : ''}
+          ${pkg.bonus > 0 ? `<li>+ ${pkg.bonus} Bonus Tokens</li>` : ''}
           <li><strong>Total: ${totalTokens} Tokens</strong></li>
         </ul>
       `;
@@ -1069,9 +1069,9 @@ app.use((err, req, res, next) => {
 // START SERVER
 // ================================
 app.listen(PORT, () => {
-  console.log(`🚀 FightPass API running on port ${PORT}`);
-  console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  console.log(`FightPass API running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
 });
 
 // Graceful shutdown
