@@ -10,7 +10,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { Client, Environment } = require('square');
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
@@ -20,16 +20,24 @@ const PORT = process.env.PORT || 3000;
 // SQUARE CLIENT SETUP
 // ================================
 const squareClient = new Client({
-  accessToken: process.env.SQUARE_ACCESS_TOKEN,
+  accessToken: process.env.SQUARE_ACCESS_TOKEN || 'placeholder',
   environment: process.env.NODE_ENV === 'production' ? Environment.Production : Environment.Sandbox
 });
 
 const { paymentsApi } = squareClient;
 
 // ================================
-// RESEND CLIENT SETUP
+// NODEMAILER SETUP (cPanel SMTP)
 // ================================
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'codeember.com',
+  port: parseInt(process.env.SMTP_PORT) || 465,
+  secure: true,
+  auth: {
+    user: process.env.SMTP_USER || 'info@codeember.com',
+    pass: process.env.SMTP_PASS || ''
+  }
+});
 
 // ================================
 // DATABASE SETUP
@@ -184,7 +192,7 @@ const verifyDigitalSignature = (data, signature) => {
   );
 };
 
-// Send receipt email via Resend
+// Send receipt email via Nodemailer (cPanel SMTP)
 const sendReceiptEmail = async (receiptData) => {
   try {
     const { email, receiptNumber, items, totalAmount, purchaseDate, signature } = receiptData;
@@ -246,8 +254,8 @@ const sendReceiptEmail = async (receiptData) => {
     </html>
     `;
 
-    const result = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'FightPass <onboarding@resend.dev>',
+    const result = await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'FightPass <info@codeember.com>',
       to: email,
       subject: `Receipt ${receiptNumber} - FightPass Purchase`,
       html: emailHtml
@@ -1068,7 +1076,7 @@ app.use((err, req, res, next) => {
 // ================================
 // START SERVER
 // ================================
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`FightPass API running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
